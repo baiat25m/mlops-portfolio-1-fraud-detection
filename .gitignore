@@ -16,11 +16,13 @@ dist/
 .ruff_cache/
 .coverage
 
-# Data, models and generated reports are not committed
-reports/
-mlruns/
-data/
-models/
+# Data, models and generated reports are not committed.
+# The leading / means "only at the repo root": without it, data/ would also
+# ignore the source package src/fraud_detection/data/.
+/reports/
+/mlruns/
+/data/
+/models/
 *.joblib
 *.pkl
 *.parquet

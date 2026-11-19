@@ -1,28 +1,12 @@
-# mlops-portfolio-1-fraud-detection
+# Fraud detection: from raw data to a production ML service
 
-Flags fraudulent credit card transactions. The project is built one step at a time, from
-raw data to a tested, deployed and monitored ML service.
+Flags fraudulent credit card transactions. Built step by step into a tested, containerized,
+monitored and automatically retrained ML service on Kubernetes and AWS.
 
-## Steps
+**Status:** step 1 of the plan, the data quality pipeline. Progress by week is in
+[STEPS.md](STEPS.md).
 
-| # | Step | State |
-| --- | --- | --- |
-| 1 | Data quality pipeline: load, check, clean, report | **in progress** |
-| 2 | First model + evaluation | - |
-| 3 | ... added one step at a time | |
-
-## Step 1: data quality pipeline
-
-```
-raw CSV -> checks (report only) -> clean -> checks (block on ERROR)
-        -> refuse if >5% of rows dropped -> clean.parquet + data_quality.md
-```
-
-### Run it
-
-1. Download "Credit Card Transactions Fraud Detection Dataset" from Kaggle (kartik2112).
-   Put `fraudTrain.csv` in `data/raw/`. (`data/` is in `.gitignore`: never commit data.)
-2. Then:
+## Quick start
 
 ```bash
 uv sync
@@ -30,13 +14,45 @@ uv run pytest
 uv run python -m fraud_detection.data.pipeline
 ```
 
-Output: `data/processed/clean.parquet` and `reports/data_quality.md`.
+The pipeline needs the data first (see below). It writes `data/processed/clean.parquet`
+and a report at `reports/data_quality.md`.
 
-### Your tasks for this step
+## Data
 
-- [ ] Read `schema.py`, then `clean.py`, then `validate.py`. Explain each function out loud.
-- [ ] Run the pipeline on the real data. Read the report: explain every number in it.
-- [ ] Add **one** check yourself, with a test: a fraud-rate sanity check. The dataset is about
-      0.5% fraud. Make the pipeline fail if the fraud rate is below 0.1% or above 5%
-      (that would mean the labels are broken). Put the limits in `schema.py`.
-- [ ] Commit: `feat: data quality pipeline for fraud transactions`.
+[Credit Card Transactions Fraud Detection Dataset](https://www.kaggle.com/datasets/kartik2112/fraud-detection)
+(Kaggle). Synthetic, about 1.3 million transactions from Jan 2019 to Jun 2020, 0.58% fraud.
+
+Download it and put `fraudTrain.csv` in `data/raw/`. Data is never committed (`/data/` is in
+`.gitignore`). To read it from somewhere else, set `RAW_DATA_PATH`.
+
+## How the pipeline works
+
+```
+raw CSV -> checks (report only) -> clean -> checks (block on any ERROR)
+        -> stop if more than 5% of rows were dropped -> clean.parquet + report
+```
+
+| File | Job |
+| --- | --- |
+| `schema.py` | The data contract: columns, types, allowed values and ranges |
+| `load.py` | Reads the raw CSV as it is |
+| `clean.py` | Row-level fixes only, every change counted |
+| `validate.py` | The checks; each returns issues instead of raising |
+| `profiling.py` | Builds the data quality report |
+| `pipeline.py` | Runs it all; config comes from environment variables |
+
+## Project layout
+
+```
+src/fraud_detection/data/   pipeline code
+tests/                      data quality tests (good data passes, broken data fails)
+docs/decisions.md           why things are built the way they are
+STEPS.md                    what gets built each week
+```
+
+## Development
+
+```bash
+uv run pre-commit install      # ruff runs on every commit
+uv run ruff check . && uv run ruff format .
+```
