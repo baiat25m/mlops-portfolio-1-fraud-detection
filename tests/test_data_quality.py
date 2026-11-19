@@ -124,6 +124,19 @@ def test_duplicate_id_fails(clean_good):
     assert any(i.dimension == "uniqueness" for i in run_checks(corrupted))
 
 
+def test_fraud_rate_too_low_fails(clean_good):
+    corrupted = clean_good.assign(is_fraud=0)  # no fraud at all: labels lost
+    issues = run_checks(corrupted)
+    assert any("fraud rate" in i.check for i in issues), issues
+
+
+def test_fraud_rate_too_high_fails(clean_good):
+    corrupted = clean_good.copy()
+    corrupted.loc[: len(corrupted) // 2, "is_fraud"] = 1  # about half: labels flipped or broken
+    issues = run_checks(corrupted)
+    assert any("fraud rate" in i.check for i in issues), issues
+
+
 def test_text_amount_fails(clean_good):
     corrupted = clean_good.assign(amt=clean_good["amt"].astype(str))
     assert any("expected numeric" in i.check for i in run_checks(corrupted))

@@ -65,3 +65,6 @@ MAX_MISSING_SHARE_CLEAN = 0.0
 
 # Cleaning may drop at most this share of rows; more means something upstream broke
 MAX_ROWS_DROPPED_SHARE = 0.05
+
+# Share of fraud rows allowed; outside this range the labels are probably broken
+FRAUD_RATE_RANGE = (0.001, 0.05)

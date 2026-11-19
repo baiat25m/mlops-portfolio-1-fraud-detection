@@ -79,6 +79,21 @@ def check_allowed_values(df: pd.DataFrame) -> list[Issue]:
     return issues
 
 
+def check_fraud_rate(df: pd.DataFrame) -> list[Issue]:
+    low, high = schema.FRAUD_RATE_RANGE
+    rate = df[schema.TARGET_COLUMN].mean()
+    if rate < low or rate > high:
+        return [
+            Issue(
+                "validity",
+                f"fraud rate {rate:.2%} outside [{low:.1%}, {high:.0%}]",
+                schema.TARGET_COLUMN,
+                len(df),
+            )
+        ]
+    return []
+
+
 def check_missing(df: pd.DataFrame, max_share: float) -> list[Issue]:
     share = df[schema.REQUIRED_COLUMNS].isna().mean()
     too_many = share[share > max_share]
@@ -104,6 +119,7 @@ def run_checks(
         *check_dtypes(df),
         *check_ranges(df),
         *check_allowed_values(df),
+        *check_fraud_rate(df),
         *check_missing(df, max_missing_share),
     ]
 
