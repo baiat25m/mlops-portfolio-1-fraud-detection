@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[oc]
+*.egg-info/
+build/
+dist/
+
+# Environments and secrets: never commit these
+.venv/
+.env
+.env.*
+!.env.example
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# Data, models and generated reports are not committed
+reports/
+mlruns/
+data/
+models/
+*.joblib
+*.pkl
+*.parquet
+
+# OS
+.DS_Store

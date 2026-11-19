@@ -1,0 +1,9 @@
+
+
+DID:     
+LEARNED: 
+BLOCKED: -
+HOURS:   
+# Subject (line 1): type(scope): what changed   e.g. feat(fraud): add fraud-rate check
+# The DID / LEARNED / BLOCKED / HOURS lines go on the LAST commit of the day only.
+# HOURS = hours studied today, e.g. 4. Lines starting with # are ignored.
